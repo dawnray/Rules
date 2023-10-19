@@ -104,7 +104,10 @@ if ($.isNode()) {
   if (isGetCookie = typeof $request !== `undefined`) {
     GetCookie();
     $.done();
-    return;
+
+  } else {
+    ApplyToBuy();
+    $.done();
   }
 
   function GetCookie() {
@@ -137,80 +140,81 @@ if ($.isNode()) {
       }
     }
   }
-
-  MT_TOKENS = MT_TOKENS.split('@');
-  Object.keys(MT_TOKENS).forEach((item) => {
-    if (MT_TOKENS[item]) {
-      CookieArr.push(MT_TOKENS[item]);
-    }
-  });
-  if (!CookieArr[0]) {
-    $.msg($.name, '❌ 未配置 MT_TOKENS\n');
-    return;
-  } else {
-    console.log(`\n当前 MT_TOKENS 数量: ${CookieArr.length} 个\n`);
-  }
-  $.sessionId = '', $.shopIds = [], $.itemCodes = [];
-  await getShopMap();  // 获取门店地图
-  await getSessionId();  // 获取申购列表
-  await getShopInfo();  // 获取门店库存
-  for (let i = 0; i < CookieArr.length; i++) {
-    $.userName = '', $.userId = '', $.mobile = '';
-    console.log(`\n======== 账号${i + 1} ========\n`);
-    let randomInt = Math.floor(Math.random() * 300);  // 随机等待 0-300 秒
-    console.log(`随机等待 ${randomInt} 秒\n`);
-    await $.wait(randomInt * 1000);
-    message += `账号 ${i + 1}  `
-    let TOKEN = CookieArr[i].split(',');
-    if (TOKEN.length === 2) {
-      DeviceID = TOKEN[0];
-      Cookie = TOKEN[1];
-    } else {
-      console.log(`Token格式错误。\n`);
-      continue;
-    }
-    await getLatestVersion();  // 获取最新版本
-    await getUserInfo();  // 获取用户信息
-    if ($.userName) {
-      for (const itemID of $.itemCodes) {
-        $.itemId = itemID;
-        $.shopIds = $.stock[$.itemId];
-        if (!$.shopIds) {
-          let msg = `❌ ${getProductInfo($.itemId, 'title')} [${$.itemId}]暂无可申购门店。\n`;
-          console.log(msg);
-          message += msg;
-          continue;
-        }
-        if ($.shopIds.length > 1) {
-          $.shopId = randomArr($.shopIds);
-        } else {
-          $.shopId = $.shopIds;
-        }
-        $.actParam = await getActParam();
-        if ($.actParam) {
-          console.log(`开始申购: ${getProductInfo($.itemId, 'title')} [${$.shopId}-${$.itemId}]\n`);
-          await $.wait(1000 * 5);
-          await reservationAdd();  // 申购商品
-        } else {
-          console.log(`getActParam失败, 跳出。`);
-        }
+  async function ApplyToBuy() {
+    MT_TOKENS = MT_TOKENS.split('@');
+    Object.keys(MT_TOKENS).forEach((item) => {
+      if (MT_TOKENS[item]) {
+        CookieArr.push(MT_TOKENS[item]);
       }
-      await $.wait(1000 * 3);
-      await getEnergyAward();  // 领取耐力
-      await get7DayReward();  // 领取连续申购奖励
-      // await getApplyingDays();  // 查询累计申购天数领取奖励
-      await getCumulativelyReward();  // 领取累计申购奖励
-      // await reservationList();  // 查询申购记录
+    });
+    if (!CookieArr[0]) {
+      $.msg($.name, '❌ 未配置 MT_TOKENS\n');
+      return;
     } else {
-      console.log(`❌ MT_TOKENS 已失效。\n`);
-      message += `❌ MT_TOKENS 已失效。\n`;
+      console.log(`\n当前 MT_TOKENS 数量: ${CookieArr.length} 个\n`);
     }
-    message += `\n`;
-  }
-  if (message) {
-    message = message.replace(/\n+$/, '');
-    $.msg($.name, '', message);
-    if ($.isNode()) await notify.sendNotify($.name, message);
+    $.sessionId = '', $.shopIds = [], $.itemCodes = [];
+    await getShopMap();  // 获取门店地图
+    await getSessionId();  // 获取申购列表
+    await getShopInfo();  // 获取门店库存
+    for (let i = 0; i < CookieArr.length; i++) {
+      $.userName = '', $.userId = '', $.mobile = '';
+      console.log(`\n======== 账号${i + 1} ========\n`);
+      let randomInt = Math.floor(Math.random() * 300);  // 随机等待 0-300 秒
+      console.log(`随机等待 ${randomInt} 秒\n`);
+      await $.wait(randomInt * 1000);
+      message += `账号 ${i + 1}  `
+      let TOKEN = CookieArr[i].split(',');
+      if (TOKEN.length === 2) {
+        DeviceID = TOKEN[0];
+        Cookie = TOKEN[1];
+      } else {
+        console.log(`Token格式错误。\n`);
+        continue;
+      }
+      await getLatestVersion();  // 获取最新版本
+      await getUserInfo();  // 获取用户信息
+      if ($.userName) {
+        for (const itemID of $.itemCodes) {
+          $.itemId = itemID;
+          $.shopIds = $.stock[$.itemId];
+          if (!$.shopIds) {
+            let msg = `❌ ${getProductInfo($.itemId, 'title')} [${$.itemId}]暂无可申购门店。\n`;
+            console.log(msg);
+            message += msg;
+            continue;
+          }
+          if ($.shopIds.length > 1) {
+            $.shopId = randomArr($.shopIds);
+          } else {
+            $.shopId = $.shopIds;
+          }
+          $.actParam = await getActParam();
+          if ($.actParam) {
+            console.log(`开始申购: ${getProductInfo($.itemId, 'title')} [${$.shopId}-${$.itemId}]\n`);
+            await $.wait(1000 * 5);
+            await reservationAdd();  // 申购商品
+          } else {
+            console.log(`getActParam失败, 跳出。`);
+          }
+        }
+        await $.wait(1000 * 3);
+        await getEnergyAward();  // 领取耐力
+        await get7DayReward();  // 领取连续申购奖励
+        // await getApplyingDays();  // 查询累计申购天数领取奖励
+        await getCumulativelyReward();  // 领取累计申购奖励
+        // await reservationList();  // 查询申购记录
+      } else {
+        console.log(`❌ MT_TOKENS 已失效。\n`);
+        message += `❌ MT_TOKENS 已失效。\n`;
+      }
+      message += `\n`;
+    }
+    if (message) {
+      message = message.replace(/\n+$/, '');
+      $.msg($.name, '', message);
+      if ($.isNode()) await notify.sendNotify($.name, message);
+    }
   }
 })()
   .catch((e) => {
