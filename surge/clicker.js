@@ -104,6 +104,7 @@ if ($.isNode()) {
   if (isGetCookie = typeof $request !== `undefined`) {
     GetCookie();
     $.done();
+    return;
   }
 
   function GetCookie() {
