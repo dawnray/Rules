@@ -139,7 +139,7 @@ if ($.isNode()) {
       }
     }
   }
-  async function ApplyToBuy() {
+  function ApplyToBuy() {
     MT_TOKENS = MT_TOKENS.split('@');
     Object.keys(MT_TOKENS).forEach((item) => {
       if (MT_TOKENS[item]) {
@@ -159,7 +159,7 @@ if ($.isNode()) {
     for (let i = 0; i < CookieArr.length; i++) {
       $.userName = '', $.userId = '', $.mobile = '';
       console.log(`\n======== 账号${i + 1} ========\n`);
-      let randomInt = Math.floor(Math.random() * 300);  // 随机等待 0-300 秒
+      let randomInt = Math.floor(Math.random() * 60);  // 随机等待 0-60 秒
       console.log(`随机等待 ${randomInt} 秒\n`);
       await $.wait(randomInt * 1000);
       message += `账号 ${i + 1}  `
