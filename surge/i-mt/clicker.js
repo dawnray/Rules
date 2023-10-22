@@ -139,7 +139,7 @@ if ($.isNode()) {
       }
     }
   }
-  function ApplyToBuy() {
+  async  function ApplyToBuy() {
     MT_TOKENS = MT_TOKENS.split('@');
     Object.keys(MT_TOKENS).forEach((item) => {
       if (MT_TOKENS[item]) {
