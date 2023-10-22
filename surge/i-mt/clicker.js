@@ -105,41 +105,6 @@ if ($.isNode()) {
     GetCookie();
     $.done();
   } else {
-    ApplyToBuy();
-    $.done();
-  }
-
-  function GetCookie() {
-    if ($request && $request.headers) {
-      if (($request.headers['MT-Token'] && $request.headers['MT-Device-ID']) || ($request.headers['mt-token'] && $request.headers['mt-device-id'])) {
-        let new_MT_Token = $request.headers['MT-Token'] || $request.headers['mt-token'];
-        let new_Device_ID = $request.headers['MT-Device-ID'] || $request.headers['mt-device-id'];
-        let old_MT_Token = MT_TOKENS.split(',') ? MT_TOKENS.split(',')[1] : '';
-        if (old_MT_Token !== new_MT_Token) {
-          $.setdata(new_Device_ID + ',' + new_MT_Token, 'MT_TOKENS');
-          $.msg($.name, `🎉 Token获取成功`, `${new_Device_ID + ',' + new_MT_Token}`);
-        } else {
-          $.log(`无需更新 MT-Token:\n${new_Device_ID + ',' + new_MT_Token}\n`);
-        }
-      }
-      if ($request.headers['MT-APP-Version'] || $request.headers['mt-app-version']) {
-        $.MT_VERSION = $request.headers['MT-APP-Version'] || $request.headers['mt-app-version'];
-        $.setdata($.MT_VERSION, `MT_VERSION`);
-        $.log(`🎉 MT_VERSION 写入成功:\n${$.MT_VERSION}\n`);
-      }
-      if ($request.headers['User-Agent'] || $request.headers['user-agent']) {
-        $.MT_USERAGENT = $request.headers['User-Agent'] || $request.headers['user-agent'];
-        $.setdata($.MT_USERAGENT, `MT_USERAGENT`);
-        $.log(`🎉 MT_USERAGENT 写入成功:\n${$.MT_USERAGENT}\n`);
-      }
-      if ($request.headers['MT-R'] || $request.headers['mt-r']) {
-        $.MT_R = $request.headers['MT-R'] || $request.headers['mt-r'];
-        $.setdata($.MT_R, `MT_R`);
-        $.log(`🎉 MT_R 写入成功:\n${$.MT_R}\n`);
-      }
-    }
-  }
-  async  function ApplyToBuy() {
     MT_TOKENS = MT_TOKENS.split('@');
     Object.keys(MT_TOKENS).forEach((item) => {
       if (MT_TOKENS[item]) {
@@ -159,7 +124,7 @@ if ($.isNode()) {
     for (let i = 0; i < CookieArr.length; i++) {
       $.userName = '', $.userId = '', $.mobile = '';
       console.log(`\n======== 账号${i + 1} ========\n`);
-      let randomInt = Math.floor(Math.random() * 60);  // 随机等待 0-60 秒
+      let randomInt = Math.floor(Math.random() * 5);  // 随机等待 0-60 秒
       console.log(`随机等待 ${randomInt} 秒\n`);
       await $.wait(randomInt * 1000);
       message += `账号 ${i + 1}  `
@@ -191,7 +156,7 @@ if ($.isNode()) {
           $.actParam = await getActParam();
           if ($.actParam) {
             console.log(`开始申购: ${getProductInfo($.itemId, 'title')} [${$.shopId}-${$.itemId}]\n`);
-            await $.wait(1000 * 5);
+            await $.wait(1000 * 3);
             await reservationAdd();  // 申购商品
           } else {
             console.log(`getActParam失败, 跳出。`);
@@ -213,6 +178,37 @@ if ($.isNode()) {
       message = message.replace(/\n+$/, '');
       $.msg($.name, '', message);
       if ($.isNode()) await notify.sendNotify($.name, message);
+    }
+  }
+
+  function GetCookie() {
+    if ($request && $request.headers) {
+      if (($request.headers['MT-Token'] && $request.headers['MT-Device-ID']) || ($request.headers['mt-token'] && $request.headers['mt-device-id'])) {
+        let new_MT_Token = $request.headers['MT-Token'] || $request.headers['mt-token'];
+        let new_Device_ID = $request.headers['MT-Device-ID'] || $request.headers['mt-device-id'];
+        let old_MT_Token = MT_TOKENS.split(',') ? MT_TOKENS.split(',')[1] : '';
+        if (old_MT_Token !== new_MT_Token) {
+          $.setdata(new_Device_ID + ',' + new_MT_Token, 'MT_TOKENS');
+          $.msg($.name, `🎉 Token获取成功`, `${new_Device_ID + ',' + new_MT_Token}`);
+        } else {
+          $.log(`无需更新 MT-Token:\n${new_Device_ID + ',' + new_MT_Token}\n`);
+        }
+      }
+      if ($request.headers['MT-APP-Version'] || $request.headers['mt-app-version']) {
+        $.MT_VERSION = $request.headers['MT-APP-Version'] || $request.headers['mt-app-version'];
+        $.setdata($.MT_VERSION, `MT_VERSION`);
+        $.log(`🎉 MT_VERSION 写入成功:\n${$.MT_VERSION}\n`);
+      }
+      if ($request.headers['User-Agent'] || $request.headers['user-agent']) {
+        $.MT_USERAGENT = $request.headers['User-Agent'] || $request.headers['user-agent'];
+        $.setdata($.MT_USERAGENT, `MT_USERAGENT`);
+        $.log(`🎉 MT_USERAGENT 写入成功:\n${$.MT_USERAGENT}\n`);
+      }
+      if ($request.headers['MT-R'] || $request.headers['mt-r']) {
+        $.MT_R = $request.headers['MT-R'] || $request.headers['mt-r'];
+        $.setdata($.MT_R, `MT_R`);
+        $.log(`🎉 MT_R 写入成功:\n${$.MT_R}\n`);
+      }
     }
   }
 })()
